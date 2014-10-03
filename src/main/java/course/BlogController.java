@@ -60,16 +60,10 @@ public class BlogController {
         initializeRoutes();
     }
 
-    abstract class FreemarkerBasedRoute extends Route {
+    abstract class FreemarkerBasedRoute implements Route {
         final Template template;
 
-        /**
-         * Constructor
-         *
-         * @param path The route path which is used for matching. (e.g. /hello, users/:name)
-         */
-        protected FreemarkerBasedRoute(final String path, final String templateName) throws IOException {
-            super(path);
+        protected FreemarkerBasedRoute(final String templateName) throws IOException {
             template = cfg.getTemplate(templateName);
         }
 
@@ -92,7 +86,7 @@ public class BlogController {
 
     private void initializeRoutes() throws IOException {
         // this is the blog home page
-        get(new FreemarkerBasedRoute("/", "blog_template.ftl") {
+        get("/", new FreemarkerBasedRoute( "blog_template.ftl") {
             @Override
             public void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 String username = sessionDAO.findUserNameBySessionId(getSessionCookie(request));
@@ -109,8 +103,9 @@ public class BlogController {
             }
         });
 
+
         // used to display actual blog post detail page
-        get(new FreemarkerBasedRoute("/post/:permalink", "entry_template.ftl") {
+        get("/post/:permalink", new FreemarkerBasedRoute("entry_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 String permalink = request.params(":permalink");
@@ -139,7 +134,7 @@ public class BlogController {
         });
 
         // handle the signup post
-        post(new FreemarkerBasedRoute("/signup", "signup.ftl") {
+        post("/signup",new FreemarkerBasedRoute( "signup.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 String email = request.queryParams("email");
@@ -177,7 +172,7 @@ public class BlogController {
         });
 
         // present signup form for blog
-        get(new FreemarkerBasedRoute("/signup", "signup.ftl") {
+        get("/signup", new FreemarkerBasedRoute("signup.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException {
@@ -198,7 +193,7 @@ public class BlogController {
         });
 
         // will present the form used to process new blog posts
-        get(new FreemarkerBasedRoute("/newpost", "newpost_template.ftl") {
+        get("/newpost", new FreemarkerBasedRoute("newpost_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
 
@@ -219,7 +214,7 @@ public class BlogController {
         });
 
         // handle the new post submission
-        post(new FreemarkerBasedRoute("/newpost", "newpost_template.ftl") {
+        post("/newpost", new FreemarkerBasedRoute("newpost_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException {
@@ -258,7 +253,7 @@ public class BlogController {
             }
         });
 
-        get(new FreemarkerBasedRoute("/welcome", "welcome.ftl") {
+        get("/welcome", new FreemarkerBasedRoute("welcome.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
 
@@ -281,7 +276,7 @@ public class BlogController {
         });
 
         // process a new comment
-        post(new FreemarkerBasedRoute("/newcomment", "entry_template.ftl") {
+        post("/newcomment", new FreemarkerBasedRoute("entry_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException {
@@ -317,7 +312,7 @@ public class BlogController {
         });
 
         // present the login page
-        get(new FreemarkerBasedRoute("/login", "login.ftl") {
+        get("/login", new FreemarkerBasedRoute("login.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 SimpleHash root = new SimpleHash();
@@ -331,7 +326,7 @@ public class BlogController {
 
         // process output coming from login form. On success redirect folks to the welcome page
         // on failure, just return an error and let them try again.
-        post(new FreemarkerBasedRoute("/login", "login.ftl") {
+        post("/login",new FreemarkerBasedRoute( "login.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
 
@@ -370,7 +365,7 @@ public class BlogController {
         });
 
         // Show the posts filed under a certain tag
-        get(new FreemarkerBasedRoute("/tag/:thetag", "blog_template.ftl") {
+        get("/tag/:thetag", new FreemarkerBasedRoute("blog_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer)
                     throws IOException, TemplateException {
@@ -393,7 +388,7 @@ public class BlogController {
 
 
         // tells the user that the URL is dead
-        get(new FreemarkerBasedRoute("/post_not_found", "post_not_found.ftl") {
+        get("/post_not_found", new FreemarkerBasedRoute("post_not_found.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 SimpleHash root = new SimpleHash();
@@ -402,7 +397,7 @@ public class BlogController {
         });
 
         // allows the user to logout of the blog
-        get(new FreemarkerBasedRoute("/logout", "signup.ftl") {
+        get("/logout",new FreemarkerBasedRoute( "signup.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
 
@@ -429,7 +424,7 @@ public class BlogController {
 
 
         // used to process internal errors
-        get(new FreemarkerBasedRoute("/internal_error", "error_template.ftl") {
+        get("/internal_error",new FreemarkerBasedRoute( "error_template.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
                 SimpleHash root = new SimpleHash();
